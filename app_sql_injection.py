@@ -68,10 +68,35 @@ def login_vulnerable():
 
     return render_template_string(HTML_TEMPLATE, result=result, query=query_log)
 
+
 # 🛠️ MISSÃO: Implemente a rota segura aqui depois
-# @app.route('/fix', methods=['GET', 'POST'])
-# def login_secure():
-#     ...
+@app.route('/fix', methods=['GET', 'POST'])
+def login_secure():
+    result = "Aguardando login..."
+    query_log = ""
+    
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        # 🚩 VULNERABILIDADE AQUI: Concatenação direta
+        sql_query = f"SELECT * FROM users WHERE username = ? AND password = ?"
+        query_log = sql_query
+        
+        try:
+            cursor = db_conn.cursor()
+            cursor.execute(sql_query, (username, password)) # Executa a string montada
+            user = cursor.fetchone() # Pega apenas o primeiro resultado
+            
+            if user:
+                # user[0]=id, user[1]=username, user[2]=password
+                result = f"<b style='color:green'>ACESSO PERMITIDO!</b> Bem-vindo, {user[1]}."
+            else:
+                result = "<b style='color:red'>ACESSO NEGADO.</b>"
+        except Exception as e:
+            result = f"Erro de Banco de Dados: {e}"
+
+    return render_template_string(HTML_TEMPLATE, result=result, query=query_log) 
 
 if __name__ == '__main__':
     app.run(debug=True)
