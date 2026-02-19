@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 # Configuração do Banco (SQLite em memória)
 def init_db():
-    conn = sqlite3.connect(':memory:')
+    conn = sqlite3.connect(':memory:', check_same_thread=False)
     c = conn.cursor()
     # Tabela com 3 colunas: id, username, password
     c.execute('''CREATE TABLE users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)''')
